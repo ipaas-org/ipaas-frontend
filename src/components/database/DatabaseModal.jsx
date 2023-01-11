@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 const DatabaseModal = function ({ setShowModal }) {
   const [databaseName, setDatabaseName] = useState('');
   const [databaseDBMS, setDatabaseDBMS] = useState('MongoDB');
@@ -22,6 +22,7 @@ const DatabaseModal = function ({ setShowModal }) {
             onChange={e => setDatabaseDBMS(e.target.value)}
             className='w-full rounded border-[1.5px] border-light-gray'
             value={databaseDBMS}
+            disabled
           >
             <option>MongoDB</option>
             <option>MySQL</option>

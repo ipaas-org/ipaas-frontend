@@ -5,8 +5,8 @@ import LoadingMessage from '../LoadingMessage';
 import ErrorMessage from '../ErrorMessage';
 
 const ApplicationContainer = function () {
-  const [applicationItem, setApplicationItem] = useState([]);
-  const [applicationLoading, setApplicationLoading] = useState(true);
+  const [applicationItem, setApplicationItem] = useState([0, 1, 2, 3]);
+  const [applicationLoading, setApplicationLoading] = useState(false);
   const [applicationError, setApplicationError] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -26,9 +26,6 @@ const ApplicationContainer = function () {
 
   useEffect(() => {
     // fetchApplicationItems();
-
-    setApplicationItem([0, 1, 2, 3]);
-    setApplicationLoading(false);
   }, []);
 
   return (

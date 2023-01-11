@@ -1,4 +1,5 @@
 const ApplicationItem = function ({ application, id }) {
+  const state = Math.random() > 0.3 ? 'running' : Math.random() > 0.6 ? 'crashed' : 'paused';
   return (
     <div
       onClick={() => alert('application item')}
@@ -6,22 +7,12 @@ const ApplicationItem = function ({ application, id }) {
       key={application}
     >
       <div className='col-span-3'>
-        <div className='flex items-center gap-4'>
-          <div className='h-6 w-6'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              viewBox='0 0 24 24'
-              strokeWidth={1.5}
-              className='h-full w-full fill-none stroke-black'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z'
-              />
-            </svg>
-          </div>
-          <h4 className='truncate text-ellipsis text-lg'>Lorem ipsum dolor sit amet.</h4>
+        <div className='flex items-center'>
+          {state === 'running' && <div className='mr-2 rounded bg-green-600 px-2 text-sm font-medium text-white'>running</div>}
+          {state === 'paused' && <div className='mr-2 rounded bg-yellow-400 px-2 text-sm font-medium text-white'>running</div>}
+          {state === 'crashed' && <div className='mr-2 rounded bg-red-400 px-2 text-sm font-medium text-white'>running</div>}
+          
+          <h4 className='truncate text-ellipsis text-lg'>lorem ipsum dolor sit amet consectetur adipisicing</h4>
         </div>
         <div className='mt-1 flex items-center gap-1'>
           <div className='h-4 w-4'>
@@ -44,7 +35,7 @@ const ApplicationItem = function ({ application, id }) {
       <div className='flex items-center justify-end'>
         <span
           onClick={e => {
-            alert('application: ' + id);
+            alert('deleted: ' + id);
             e.stopPropagation();
           }}
           className='rounded-md p-2 hover:bg-light-gray'

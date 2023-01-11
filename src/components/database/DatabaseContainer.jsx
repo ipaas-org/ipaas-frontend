@@ -5,8 +5,8 @@ import LoadingMessage from '../LoadingMessage';
 import ErrorMessage from '../ErrorMessage';
 
 const DatabaseContainer = function () {
-  const [databaseItem, setDatabaseItem] = useState([]);
-  const [databaseLoading, setDatabaseLoading] = useState(true);
+  const [databaseItem, setDatabaseItem] = useState([0, 1]);
+  const [databaseLoading, setDatabaseLoading] = useState(false);
   const [databaseError, setDatabaseError] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
@@ -26,9 +26,6 @@ const DatabaseContainer = function () {
 
   useEffect(() => {
     // fetchDatabaseItems();
-
-    setDatabaseItem([0, 1]);
-    setDatabaseLoading(false);
   }, []);
 
   return (

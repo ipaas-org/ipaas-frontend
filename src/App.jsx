@@ -9,7 +9,7 @@ const App = function () {
   //   setLoggedIn(true);
   // }, [])
 
-  return loggedIn ? <Application /> : <Login callback={setLoggedIn} />;
+  return loggedIn ? <Application setLoggedIn={setLoggedIn} /> : <Login setLoggedIn={setLoggedIn} />;
 };
 
 export default App;

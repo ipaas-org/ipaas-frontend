@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
+import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
-import Application from './pages/Application';
 
 const App = function () {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -9,7 +9,7 @@ const App = function () {
   //   setLoggedIn(true);
   // }, [])
 
-  return loggedIn ? <Application setLoggedIn={setLoggedIn} /> : <Login setLoggedIn={setLoggedIn} />;
+  return loggedIn ? <Dashboard setLoggedIn={setLoggedIn} /> : <Login setLoggedIn={setLoggedIn} />;
 };
 
 export default App;

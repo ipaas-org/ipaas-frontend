@@ -2,9 +2,16 @@ import { useState } from 'react';
 const DatabaseModal = function ({ setShowModal }) {
   const [databaseName, setDatabaseName] = useState('');
   const [databaseDBMS, setDatabaseDBMS] = useState('MongoDB');
+
+  const handleClose = function (e) {
+    if (e.target.classList.contains('absolute')) {
+      setShowModal(false);
+    }
+  };
+
   // todo: fare il controllo sui dati in input con validator e creare componenti per gli errori di messaggio
   return (
-    <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-25'>
+    <div onClick={handleClose} className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-25'>
       <div className='custom-shadow w-4/5 rounded-xl bg-white px-2 md:px-8 lg:w-1/3'>
         <div className='py-8 text-xl font-semibold'>new database</div>
         <div className='mb-6'>

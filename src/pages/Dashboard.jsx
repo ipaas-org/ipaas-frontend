@@ -2,7 +2,7 @@ import Header from '../components/header/Header';
 import ApplicationContainer from '../components/application/ApplicationContainer';
 import DatabaseContainer from '../components/database/DatabaseContainer';
 
-const Application = function ({setLoggedIn}) {
+const Dashboard = function ({setLoggedIn}) {
   return (
     <div className='relative h-screen px-2 md:px-10 lg:px-20'>
       <Header setLoggedIn={setLoggedIn} />
@@ -14,4 +14,4 @@ const Application = function ({setLoggedIn}) {
   );
 };
 
-export default Application;
+export default Dashboard;

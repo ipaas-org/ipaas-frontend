@@ -9,8 +9,14 @@ const ApplicationModal = function ({ setShowModal }) {
 
   useEffect(() => {}, []);
 
+  const handleClose = function (e) {
+    if (e.target.classList.contains('absolute')) {
+      setShowModal(false);
+    }
+  };
+
   return (
-    <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-25'>
+    <div onClick={handleClose} className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-25'>
       <div className='custom-shadow max-h-[80%] w-4/5 overflow-y-scroll rounded-xl bg-white px-2 md:px-8 lg:w-1/3'>
         <div className='py-8 text-xl font-semibold'>new application</div>
         <div className='mb-6'>

@@ -9,8 +9,8 @@ const ApplicationItem = function ({ application, id }) {
       <div className='col-span-3'>
         <div className='flex items-center'>
           {state === 'running' && <div className='mr-2 rounded bg-green-600 px-2 text-sm font-medium text-white'>running</div>}
-          {state === 'paused' && <div className='mr-2 rounded bg-yellow-400 px-2 text-sm font-medium text-white'>running</div>}
-          {state === 'crashed' && <div className='mr-2 rounded bg-red-400 px-2 text-sm font-medium text-white'>running</div>}
+          {state === 'paused' && <div className='mr-2 rounded bg-yellow-400 px-2 text-sm font-medium text-white'>paused</div>}
+          {state === 'crashed' && <div className='mr-2 rounded bg-red-400 px-2 text-sm font-medium text-white'>crashed</div>}
           
           <h4 className='truncate text-ellipsis text-lg'>lorem ipsum dolor sit amet consectetur adipisicing</h4>
         </div>

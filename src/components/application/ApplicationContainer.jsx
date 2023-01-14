@@ -1,32 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ApplicationItem from './ApplicationItem';
 import ApplicationModal from './ApplicationModal';
 import LoadingMessage from '../LoadingMessage';
 import ErrorMessage from '../ErrorMessage';
+import useFetch from './../../utils/useFetch'
 
 const ApplicationContainer = function () {
-  const [applicationItem, setApplicationItem] = useState([0, 1, 2, 3]);
-  const [applicationLoading, setApplicationLoading] = useState(false);
-  const [applicationError, setApplicationError] = useState(null);
+  const { data, loading, error } = useFetch();
   const [showModal, setShowModal] = useState(false);
-
-  const fetchApplicationItems = async function () {
-    try {
-      setApplicationLoading(true);
-      setApplicationError(null);
-      const response = await fetch('#');
-      const data = await response.json();
-      setApplicationItem(data);
-    } catch (err) {
-      setApplicationError(err);
-    } finally {
-      setApplicationLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // fetchApplicationItems();
-  }, []);
 
   return (
     <div className='custom-shadow overflow-hidden rounded-xl md:col-span-8'>
@@ -37,10 +18,11 @@ const ApplicationContainer = function () {
             new
           </button>
         </div>
-        {applicationLoading && <LoadingMessage />}
-        {applicationItem.length > 0 &&
-          applicationItem.map((app, index) => <ApplicationItem application={app} key={index} id={index} />)}
-        {applicationError && <ErrorMessage message={applicationError} />}
+        {loading && <LoadingMessage />}
+        {data?.application?.map((app, key) => (
+          <ApplicationItem application={app} id={key} key={key} />
+        ))}
+        {error && <ErrorMessage message={error} />}
       </div>
       {showModal && <ApplicationModal setShowModal={setShowModal} />}
     </div>

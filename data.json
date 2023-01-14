@@ -1,0 +1,69 @@
+{
+  "name": "Adriano Rampoldi",
+  "email": "chandradas.vanceadam.studente@itispaleocapa.it",
+  "avaibleLanguage": [
+    "Nodejs", "Java", "Rust", "Go"
+  ],
+  "avaibleDBMS": [
+    "PhpMyAdmin", "MongoDB", "Rust", "Go"
+  ],
+  "application": [
+    {
+      "url": "https://www.google.com/",
+      "name": "prima applicazione",
+      "repository-link": "https://github.com/Cuberto/mouse-follower",
+      "branch": "Master",
+      "programming-language": "Javascript",
+      "port": 8080,
+      "status": "running",
+      "visibility": "private"
+    },
+    {
+      "url": "https://www.google.com/",
+      "name": "applicazione di test",
+      "repository-link": "https://github.com/Cuberto/mouse-follower",
+      "branch": "Master",
+      "programming-language": "Javascript",
+      "port": 8080,
+      "status": "paused",
+      "visibility": "public"
+    },
+    {
+      "url": "https://www.google.com/",
+      "name": "applicazione di prova",
+      "repository-link": "https://github.com/Cuberto/mouse-follower",
+      "branch": "Master",
+      "programming-language": "Javascript",
+      "port": 8080,
+      "status": "running",
+      "visibility": "public"
+    },
+    {
+      "url": "https://www.google.com/",
+      "name": "applicazione",
+      "repository-link": "https://github.com/Cuberto/mouse-follower",
+      "branch": "Master",
+      "programming-language": "Javascript",
+      "port": 8080,
+      "status": "crashed",
+      "visibility": "private"
+    }
+  ],
+  "database": [
+    {
+      "name": "mio database",
+      "dbms": "MongoDB",
+      "status": "running"
+    },
+    {
+      "name": "database placeholder di test",
+      "dbms": "PhpMyAdmin",
+      "status": "crashed"
+    },
+    {
+      "name": "database singolo",
+      "dbms": "MariaDB",
+      "status": "paused"
+    }
+  ]
+}

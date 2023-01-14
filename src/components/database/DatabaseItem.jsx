@@ -1,29 +1,37 @@
 const DatabaseItem = function ({ database, id }) {
-  const state = Math.random() > 0.3 ? 'running' : Math.random() > 0.6 ? 'crashed' : 'paused';
+  const { name, dbms, status } = database;
   return (
     <div
-      onClick={() => alert('database item')}
-      className='grid cursor-pointer grid-cols-4 px-8 py-6 transition-all hover:bg-hover-blue'
+      // onClick={() => alert('cliccato database item')}
+      className='grid grid-cols-4 px-8 py-6 transition-all hover:bg-hover-blue'
       key={database}
     >
       <div className='col-span-3'>
         <div className='flex items-center'>
-          {state === 'running' && <div className='mr-2 rounded bg-green-600 px-2 text-sm font-medium text-white'>running</div>}
-          {state === 'paused' && <div className='mr-2 rounded bg-yellow-400 px-2 text-sm font-medium text-white'>paused</div>}
-          {state === 'crashed' && <div className='mr-2 rounded bg-red-400 px-2 text-sm font-medium text-white'>crashed</div>}
+          {status === 'running' && (
+            <div className='mr-2 rounded bg-green-600 px-2 text-sm font-medium text-white'>running</div>
+          )}
+          {status === 'paused' && (
+            <div className='mr-2 rounded bg-yellow-400 px-2 text-sm font-medium text-white'>paused</div>
+          )}
+          {status === 'crashed' && (
+            <div className='mr-2 rounded bg-red-400 px-2 text-sm font-medium text-white'>crashed</div>
+          )}
 
-          <h4 className='truncate text-ellipsis text-lg'>database placeholder</h4>
+          <h4 className='truncate text-ellipsis text-lg'>{name}</h4>
         </div>
 
-        <h6 className='mt-1 text-sm text-gray'>MongoDB</h6>
+        <h6 className='mt-1 text-sm text-gray'>{dbms}</h6>
       </div>
       <div className='flex items-center justify-end'>
         <span
           onClick={e => {
-            alert('deleted: ' + id);
+            alert('deleted database: ' + id);
+
+            // inutile se il db non è cliccabile come le applicazioni
             e.stopPropagation();
           }}
-          className='rounded-md p-2 hover:bg-light-gray'
+          className='cursor-pointer rounded-md p-2 hover:bg-light-gray'
         >
           <svg
             className='pointer-events-none h-6 w-6 fill-none stroke-black'

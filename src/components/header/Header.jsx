@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import HeaderModal from './HeaderModal';
-const Header = function ({setLoggedIn}) {
+const Header = function ({ setLoggedIn }) {
   const [showModal, setShowModal] = useState(false);
 
   return (

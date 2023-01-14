@@ -1,32 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import DatabaseItem from './DatabaseItem';
 import DatabaseModal from './DatabaseModal';
 import LoadingMessage from '../LoadingMessage';
 import ErrorMessage from '../ErrorMessage';
+import useFetch from './../../utils/useFetch'
+
+const sleep = function (s) {
+  return new Promise(res => setTimeout(res, s * 1000));
+};
 
 const DatabaseContainer = function () {
-  const [databaseItem, setDatabaseItem] = useState([0, 1]);
-  const [databaseLoading, setDatabaseLoading] = useState(false);
-  const [databaseError, setDatabaseError] = useState(null);
+  const { data, loading, error } = useFetch();
   const [showModal, setShowModal] = useState(false);
-
-  const fetchDatabaseItems = async function () {
-    try {
-      setDatabaseLoading(true);
-      setDatabaseError(null);
-      const response = await fetch('#');
-      const data = await response.json();
-      setDatabaseItem(data);
-    } catch (err) {
-      setDatabaseError(err);
-    } finally {
-      setDatabaseLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    // fetchDatabaseItems();
-  }, []);
 
   return (
     <div className='custom-shadow overflow-hidden rounded-xl md:col-span-4'>
@@ -37,10 +22,11 @@ const DatabaseContainer = function () {
             new
           </button>
         </div>
-        {databaseLoading && <LoadingMessage />}
-        {databaseItem.length > 0 &&
-          databaseItem.map((db, index) => <DatabaseItem database={db} key={index} id={index} />)}
-        {databaseError && <ErrorMessage message={databaseError} />}
+        {loading && <LoadingMessage />}
+        {data?.database?.map((db, key) => (
+          <DatabaseItem database={db} id={key} key={key} />
+        ))}
+        {error && <ErrorMessage message={error} />}
       </div>
       {showModal && <DatabaseModal setShowModal={setShowModal} />}
     </div>

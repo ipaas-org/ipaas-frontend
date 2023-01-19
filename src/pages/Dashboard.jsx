@@ -3,7 +3,6 @@ import ApplicationContainer from '../components/application/ApplicationContainer
 import DatabaseContainer from '../components/database/DatabaseContainer';
 
 const Dashboard = function ({ setLoggedIn }) {
-  console.clear();
   return (
     <div className='relative h-screen px-2 md:px-10 lg:px-20'>
       <Header setLoggedIn={setLoggedIn} />

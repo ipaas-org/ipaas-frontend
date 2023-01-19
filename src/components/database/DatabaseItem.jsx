@@ -1,10 +1,9 @@
-const DatabaseItem = function ({ database, id }) {
+const DatabaseItem = function ({ database }) {
   const { name, dbms, status } = database;
   return (
     <div
       // onClick={() => alert('cliccato database item')}
       className='grid grid-cols-4 px-8 py-6 transition-all hover:bg-hover-blue'
-      key={database}
     >
       <div className='col-span-3'>
         <div className='flex items-center'>

@@ -20,7 +20,7 @@ const ApplicationContainer = function () {
         </div>
         {loading && <LoadingMessage />}
         {data?.application?.map((app, key) => (
-          <ApplicationItem application={app} id={key} key={key} />
+          <ApplicationItem application={app} key={key} />
         ))}
         {error && <ErrorMessage message={error} />}
       </div>

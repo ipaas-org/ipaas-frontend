@@ -1,132 +1,174 @@
-import { useState, useEffect } from 'react';
-import validator from 'validator';
+import { useEffect, useState } from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const ApplicationModal = function ({ setShowModal }) {
-  const [name, setName] = useState('');
-  const [repositoryLink, setRepositoryLink] = useState('');
-  const [branch, setBranch] = useState('');
-  const [language, setLanguage] = useState('');
-  const [port, setPort] = useState('');
-  const [enviromentVariablesNumber, setEnviromentVariablesNumber] = useState(0);
-  const [enviromentVariables, setEnviromentVariables] = useState({});
-
+  const [envVariablesLength, setEnvVariablesLength] = useState(0);
+  const [envVariablesEl, setEnvVariablesEl] = useState(null);
+  const [envVariables, setEnvVariables] = useState({});
   const avaibleLanguage = ['Nodejs', 'Java', 'Rust', 'Go'];
 
   const handleClose = function (e) {
     if (e.target.classList.contains('closer')) {
-      setName('');
-      setRepositoryLink('');
-      setBranch('');
-      setLanguage('');
-      setPort('');
-      setEnviromentVariablesNumber(0);
-      setEnviromentVariables({});
       setShowModal(false);
     }
   };
+
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      repositoryLink: '',
+      branch: '',
+      language: '',
+      port: 8080,
+    },
+    onSubmit(values) {
+      alert('inviato: ' + values);
+    },
+    validationSchema: Yup.object({
+      name: Yup.string('invalid name')
+        .matches(
+          /^[a-zA-Z][a-zA-Z0-9 _-]*$/,
+          'name must not start with a number and must not have any special characters'
+        )
+        .required('name is required'),
+      repositoryLink: Yup.string('invalid repository link')
+        .matches('^(https://|http://|)(www.)?github.com/([A-Za-z0-9-/])*$', 'url must be a valid github link')
+        .required('repository link is required'),
+      branch: Yup.string('invalid branch')
+        .oneOf(avaibleLanguage, 'branch must be available')
+        .required('branch is required'),
+      language: Yup.string('invalid language')
+        .oneOf(avaibleLanguage, 'language must be available')
+        .required('language is required'),
+      port: Yup.number('invalid number')
+        .integer('port must be an integer')
+        .moreThan(1024, 'number must be grater than 1024')
+        .lessThan(65000, 'number must be less than 65000')
+        .required('port is required'),
+    }),
+  });
+
+  useEffect(()=>{
+    const current = new Array(envVariablesLength).fill(null).map((_, key) => (
+      <EnviromentVariable key={key} envVariables={envVariables} setEnvVariables={setEnvVariables} />
+    ))
+
+  }, [envVariablesLength])
 
   return (
     <div
       onClick={handleClose}
       className='closer absolute inset-0 z-40 flex items-center justify-center bg-black bg-opacity-25'
     >
-      <div className='custom-shadow max-h-[80%] w-4/5 overflow-y-scroll rounded-xl bg-white px-2 md:px-8 lg:w-1/3'>
+      <div className='custom-shadow max-h-[90%] w-[90%] overflow-y-scroll rounded-xl bg-white px-8 lg:w-1/3'>
         <div className='py-8 text-xl font-semibold'>new application</div>
 
-        <div className='mb-4'>
-          <div className='mb-2'>nome del progetto: {name}</div>
+        <div className='mb-5'>
+          <div className='mb-2'>project name:</div>
           <input
-            onChange={e => setName(e.target.value.trimStart())}
-            type='text'
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.name}
             spellCheck='false'
+            type='text'
+            name='name'
             className='w-full rounded border-[1.5px] border-light-gray'
-            value={name}
           />
+          <p className='text-sm font-medium text-red-500'>{formik.touched.name && formik.errors.name}</p>
         </div>
-        <div className='mb-6'>
+        <div className='mb-5'>
           <div className='mb-1'>repository link:</div>
           <input
-            onChange={e => setRepositoryLink(e.target.value)}
-            type='text'
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.repositoryLink}
             spellCheck='false'
+            type='text'
+            name='repositoryLink'
             className='w-full rounded border-[1.5px] border-light-gray'
-            value={repositoryLink}
           />
+          <p className='text-sm font-medium text-red-500'>
+            {formik.touched.repositoryLink && formik.errors.repositoryLink}
+          </p>
         </div>
-        <div className='mb-6'>
+        <div className='mb-5'>
           <div className='mb-1'>select branch:</div>
-          {validator.isURL(repositoryLink) ? (
+          {/* {validator.isURL(repositoryLink) ? ( */}
+          {false ? (
             <select
-              onChange={e => setBranch(e.target.value)}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.branch}
+              name='branch'
               className='w-full rounded border-[1.5px] border-light-gray'
-              value={branch}
             >
               <option>master</option>
               <option>frontend</option>
               <option>backend</option>
             </select>
           ) : (
-            <select className='w-full rounded border-[1.5px] border-light-gray' disabled></select>
+            <select name='branch' className='w-full rounded border-[1.5px] border-light-gray' disabled></select>
           )}
+          <p className='text-sm font-medium text-red-500'>{formik.touched.branch && formik.errors.branch}</p>
         </div>
-        <div className='mb-6'>
+        <div className='mb-5'>
           <div className='mb-1'>programming language:</div>
           {avaibleLanguage.length > 0 ? (
             <select
-              onChange={e => setLanguage(e.target.value)}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.language}
+              name='language'
               className='w-full rounded border-[1.5px] border-light-gray'
-              value={language}
             >
-              {avaibleLanguage.map(language => (
-                <option key={language} id={language}>
-                  {language}
-                </option>
+              {avaibleLanguage.map((language, key) => (
+                <option key={key}>{language}</option>
               ))}
             </select>
           ) : (
-            <select className='w-full rounded border-[1.5px] border-light-gray' disabled></select>
+            <select name='language' className='w-full rounded border-[1.5px] border-light-gray' disabled></select>
           )}
+          <p className='text-sm font-medium text-red-500'>{formik.touched.language && formik.errors.language}</p>
         </div>
-        <div className='mb-6'>
+        <div className='mb-5'>
           <div className='mb-1'>port:</div>
           <input
-            onChange={e => setPort(e.target.value)}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.port}
+            name='port'
+            placeholder='8080'
             type='number'
             className='w-full rounded border-[1.5px] border-light-gray'
-            value={port}
-            placeholder='8080'
           />
+          <p className='text-sm font-medium text-red-500'>{formik.touched.port && formik.errors.port}</p>
         </div>
         <div className='mb-4'>
           <div className='mb-1'>environment variables:</div>
-          {new Array(enviromentVariablesNumber).fill(0).map((_, index) => (
-            <EnviromentVariable
-              key={index}
-              id={index}
-              enviromentVariables={enviromentVariables}
-              setEnviromentVariables={setEnviromentVariables}
-            />
-          ))}
+          {}
           <button
-            onClick={() => setEnviromentVariablesNumber(enviromentVariablesNumber + 1)}
+            onClick={() => setEnvVariablesLength(prev => prev + 1)}
             className='w-full rounded border-[1.5px] border-light-gray py-2 transition-all hover:bg-light-gray'
           >
             new variable
           </button>
         </div>
 
-        <div className='grid grid-cols-2 gap-2 py-6 text-lg  font-semibold'>
+        <div className='grid grid-cols-2 gap-2 py-6 text-lg font-semibold'>
           <button onClick={handleClose} className='closer w-full rounded py-2 transition-all hover:bg-light-gray'>
             cancel
           </button>
-          <button className='w-full rounded bg-blue py-2 text-white'>create</button>
+          <button onClick={formik.handleSubmit} className='w-full rounded bg-blue py-2 text-white'>
+            create
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-const EnviromentVariable = function ({ enviromentVariables, setEnviromentVariables }) {
+const EnviromentVariable = function ({ envVariables, setEnvVariables }) {
   return (
     <div className='mb-2 flex items-center gap-2'>
       <input

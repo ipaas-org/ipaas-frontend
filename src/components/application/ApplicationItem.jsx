@@ -1,4 +1,4 @@
-const ApplicationItem = function ({ application, id }) {
+const ApplicationItem = function ({ application }) {
   const { name, url, visibility, status } = application;
 
   const handleopen = function () {
@@ -9,7 +9,6 @@ const ApplicationItem = function ({ application, id }) {
       onClick={handleopen}
       target='_blank'
       className='grid cursor-pointer grid-cols-4 px-8 py-6 transition-all hover:bg-hover-blue'
-      key={application}
     >
       <div className='col-span-3'>
         <div className='flex items-center'>

@@ -1,9 +1,7 @@
-import { useState } from 'react';
-import validator from 'validator';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const DatabaseModal = function ({ setShowModal }) {
-  const [name, setName] = useState('');
-  const [DBMS, setDBMS] = useState('');
   const avaibleDBMS = ['PhpMyAdmin', 'MongoDB', 'SQL'];
 
   const handleClose = function (e) {
@@ -12,13 +10,25 @@ const DatabaseModal = function ({ setShowModal }) {
     }
   };
 
-  const handleSubmit = function () {
-    if (validator.isAlpha(name)) {
-      alert('input corretto');
-    } else alert('no');
-  };
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      dbms: avaibleDBMS[0],
+    },
+    onSubmit(values) {
+      alert('inviato: ' + values);
+    },
+    validationSchema: Yup.object({
+      name: Yup.string('deve essere una stringa')
+        .matches(/^[a-zA-Z][a-zA-Z0-9 _-]*$/, 'Il nome può contenere solo lettere')
+        .required('deve essere compilato'),
+      dbms: Yup.string('deve essere una stringa')
+        .oneOf(avaibleDBMS, 'La stringa deve essere una delle opzioni valide')
+        .required('deve essere compilato'),
+    }),
+  });
+  console.clear();
 
-  // todo: creare componenti per gli errori di messaggio
   return (
     <div
       onClick={handleClose}
@@ -26,32 +36,37 @@ const DatabaseModal = function ({ setShowModal }) {
     >
       <div className='custom-shadow w-4/5 rounded-xl bg-white px-2 md:px-8 lg:w-1/3'>
         <div className='py-8 text-xl font-semibold'>new database</div>
-        <div className='mb-6'>
+        <div className='mb-5'>
           <div className='mb-2'>name:</div>
           <input
-            onChange={e => setName(e.target.value)}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.name}
+            spellCheck='false'
             type='text'
-            value={name}
+            name='name'
             className='w-full rounded border-[1.5px] border-light-gray'
           />
+          <p className='text-sm font-medium text-red-500'>{formik.touched.name && formik.errors.name}</p>
         </div>
         <div className='mb-4'>
           <div className='mb-2'>DBMS:</div>
           {avaibleDBMS.length > 0 ? (
             <select
-              onChange={e => setDBMS(e.target.value)}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.dbms}
+              name='dbms'
               className='w-full rounded border-[1.5px] border-light-gray'
-              value={DBMS}
             >
               {avaibleDBMS.map(DBMS => (
-                <option key={DBMS} id={DBMS}>
-                  {DBMS}
-                </option>
+                <option key={DBMS}>{DBMS}</option>
               ))}
             </select>
           ) : (
-            <select className='w-full rounded border-[1.5px] border-light-gray' disabled></select>
+            <select name='dbms' className='w-full rounded border-[1.5px] border-light-gray' disabled></select>
           )}
+          <p className='text-sm font-medium text-red-500'>{formik.touched.dbms && formik.errors.dbms}</p>
         </div>
         <div className='grid grid-cols-2 gap-2 py-6 text-lg font-semibold'>
           <button
@@ -60,7 +75,7 @@ const DatabaseModal = function ({ setShowModal }) {
           >
             cancel
           </button>
-          <button onClick={handleSubmit} className='w-full rounded bg-blue py-2 text-white'>
+          <button onClick={formik.handleSubmit} className='w-full rounded bg-blue py-2 text-white'>
             create
           </button>
         </div>

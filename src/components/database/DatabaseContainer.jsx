@@ -23,8 +23,8 @@ const DatabaseContainer = function () {
           </button>
         </div>
         {loading && <LoadingMessage />}
-        {data?.database?.map((db, key) => (
-          <DatabaseItem database={db} id={key} key={key} />
+        {data?.database?.map((database, key) => (
+          <DatabaseItem database={database} key={key} />
         ))}
         {error && <ErrorMessage message={error} />}
       </div>

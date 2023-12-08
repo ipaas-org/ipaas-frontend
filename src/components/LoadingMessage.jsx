@@ -26,5 +26,16 @@ const LoadingItem = function () {
     </div>
   );
 };
+const LoadingName = function(){
+  return (
+    <div className='mr-8 h-6 w-24 animate-pulse rounded bg-slate-300'></div>
+  )
+}
 
-export default LoadingMessage;
+const LoadingProfilePicture = function(){
+  return (
+    <div className='h-10 w-10 animate-pulse rounded-full bg-slate-300'></div>
+  )
+}
+
+export {LoadingMessage, LoadingItem, LoadingName, LoadingProfilePicture};

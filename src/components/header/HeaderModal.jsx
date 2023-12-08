@@ -1,5 +1,9 @@
 // todo: use state per fare il tema
-const HeaderModal = function ({ setShowModal, setLoggedIn }) {
+import STORE from "../../utils/store";
+import { deleteTokens } from "../../utils/tokens";
+
+
+const HeaderModal = function ({user, setShowModal, setLoggedIn }) {
   const handleBackgroundClick = function (e) {
     if (e.target.classList.contains('inset-0')) {
       setShowModal(false);
@@ -8,10 +12,13 @@ const HeaderModal = function ({ setShowModal, setLoggedIn }) {
   return (
     <div onClick={handleBackgroundClick} className='absolute inset-0 z-40 bg-opacity-10'>
       <div className='custom-shadow absolute right-20 mt-20 space-y-4 rounded border-r-4 border-blue bg-white py-6 px-8 text-end text-lg'>
-        <div className=''>dance.vance.adam.studente@itispaleocapa.it</div>
-        <div className='cursor-pointer'>theme</div>
+        <div className=''>{user.userInfo.email}</div>
+        {/* <div className='cursor-pointer'>theme</div> */}
         <div
           onClick={e => {
+            deleteTokens();
+            STORE.Storage.DelObject("user");
+            window.location.href = "/";
             setLoggedIn(false);
             e.stopPropagation();
           }}

@@ -3,7 +3,10 @@ import ApplicationContainer from '../components/application/ApplicationContainer
 import DatabaseContainer from '../components/database/DatabaseContainer';
 
 const Dashboard = function ({ setLoggedIn }) {
-  return (
+  if (window.location.href.includes("key")) {
+    window.location.href="/dashboard"
+  }
+    return (
     <div className='relative h-screen px-2 md:px-10 lg:px-20'>
       <Header setLoggedIn={setLoggedIn} />
       <main className='grid gap-5 md:h-5/6 md:grid-cols-12'>

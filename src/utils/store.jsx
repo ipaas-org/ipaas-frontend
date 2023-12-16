@@ -4,6 +4,7 @@ const DATA = "data_";
 var STORE = {
   Config: {
     API: "http://api.ipaas.localhost/api/v1/",
+    // API: "http://100.74.150.124:8082/api/v1/", //tailscale ip
   },
   Storage: {
     Clear: function () {

@@ -1,9 +1,10 @@
 import {API} from "./api";
 import STORE from "./store";
 
-const refreshTokens = function (t, setError, setLoggedIn) {
+const refreshTokens = function (refreshToken, successCallback, errorCallback) {
+  //setError, setLoggedIn
   API.post("/token/refresh", {
-    refresh_token: t,
+    refresh_token: refreshToken,
   })
     .then((response) => {
       const accessToken = response.data.data.access_token;
@@ -17,12 +18,14 @@ const refreshTokens = function (t, setError, setLoggedIn) {
         refreshToken,
         refreshTokenExpiration
       );
-      setError(false);
-      setLoggedIn(true);
+      successCallback();
+      // setError(false);
+      // setLoggedIn(true);
     })
     .catch((error) => {
-      console.log("error:", error);
-      setError(true);
+      console.log("error refreshing tokens:", error);
+      // setError(true);
+      errorCallback();
     });
 };
 
@@ -71,7 +74,30 @@ const setTokens = function (
 };
 
 const getAccessToken = function () {
-  return STORE.Storage.Get("accessToken");
+  let accessToken = STORE.Storage.Get("accessToken");
+  let accessTokenExpiration = STORE.Storage.Get("accessTokenExpiration");
+  if (!accessToken || !accessTokenExpiration) {
+    let refreshToken = STORE.Storage.Get("refreshToken");
+    let refreshTokenExpiration = STORE.Storage.Get("refreshTokenExpiration");
+    if (!refreshToken || !refreshTokenExpiration) {
+      return null;
+    } else {
+      refreshTokens(
+        refreshToken,
+        () => {
+          console.log("tokens refreshed");
+        },
+        () => {}
+      );
+      accessToken = STORE.Storage.Get("accessToken");
+      accessTokenExpiration = STORE.Storage.Get("accessTokenExpiration");
+      if (!accessToken || !accessTokenExpiration) {
+        return null;
+      }
+      return accessToken;
+    }
+  }
+  return accessToken;
 };
 
 export {getAccessToken, refreshTokens, retriveTokens, deleteTokens, setTokens};

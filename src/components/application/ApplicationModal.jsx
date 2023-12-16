@@ -1,24 +1,18 @@
-import {useEffect, useState} from "react";
-import {Field, useFormik} from "formik";
-import * as Yup from "yup";
-import sleep from "./../../utils/sleep";
-
-const validateName = function (e) {
-  let name = e.target.value;
-  console.log("validating name:", name);
-  sleep(2);
-  //check if name contains any special characters except _ and -
-
-  if (name === "vano") {
-    console.log("name already taken");
-    return "name already taken";
-  }
-};
+import {useState} from "react";
+import {Formik, Form} from "formik";
+import {API} from "../../utils/api";
+import BranchField from "../fields/BranchField";
+import {EnviromentVariableField} from "../fields/EnvironmentVariableField";
+import {getAccessToken} from "../../utils/tokens";
+import RepositoryField from "../fields/RepositoryField";
+import NameField from "../fields/NameField";
+import PortField from "../fields/PortField";
 
 const ApplicationModal = function ({setShowModal}) {
-  const [envVariablesLength, setEnvVariablesLength] = useState(0);
-  const [envVariablesEl, setEnvVariablesEl] = useState(null);
+  const [branches, setBranches] = useState([]);
   const [envVariables, setEnvVariables] = useState([]);
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClose = function (e) {
     if (e.target.classList.contains("closer")) {
@@ -26,284 +20,140 @@ const ApplicationModal = function ({setShowModal}) {
     }
   };
 
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      repositoryLink: "",
-      branch: "",
-      // language: "",
-      port: 80,
-    },
-    onSubmit(values) {
-      alert("inviato: " + values);
-    },
-    validationSchema: Yup.object({
-      name: Yup.string("invalid name")
-        .matches(
-          /^[a-zA-Z0-9-_]+$/,
-          "name must not start with a number and must not have any special characters"
-        )
-        .required("name is required"),
-      repositoryLink: Yup.string("invalid repository link")
-        .matches(
-          "^(https://|http://|)(www.)?github.com/([A-Za-z0-9-/])*$",
-          "url must be a valid github link"
-        )
-        .required("repository link is required"),
-      // branch: Yup.string("invalid branch")
-      //   .oneOf(avaibleLanguage, "branch must be available")
-      //   .required("branch is required"),
-      // language: Yup.string("invalid language")
-      //   .oneOf(avaibleLanguage, "language must be available")
-      //   .required("language is required"),
-      port: Yup.number("invalid number")
-        .integer("port must be an integer")
-        .moreThan(20, "number must be grater than 20")
-        .lessThan(65536, "number must be less than 65536")
-        .required("port is required"),
-    }),
-  });
+  const handleEnvVariablesCallback = function (env, isError) {
+    setIsFormValid(!isError);
+    setEnvVariables(env);
+  };
 
-  useEffect(() => {
-    console.log("changed envVariables:", envVariables);
-  }, [envVariables]);
+  const submitForm = function (values) {
+    setIsSubmitting(true);
+    console.log("values:", values);
+    console.log("isFormValid:", isFormValid);
+    console.log("envVariables:", envVariables);
+    if (
+      !isFormValid ||
+      values.repo === "" ||
+      values.name === "" ||
+      values.port === ""
+    ) {
+      alert("form is not valid");
+      setIsSubmitting(false);
+      return;
+    }
 
-  useEffect(() => {
-    const current = new Array(envVariablesLength)
-      .fill(null)
-      .map((_, key) => (
-        <EnviromentVariable
-          key={key}
-          index={key}
-          envVariables={envVariables}
-          setEnvVariables={setEnvVariables}
-          setEnvVariablesLength={setEnvVariablesLength}
-        />
-      ));
-    setEnvVariablesEl(current);
-    // setEnvVariablesLength(current.length);
-    // console.log("current:", current);
-  }, [envVariablesLength]);
-  // useEffect(() => {
-  //   const current = new Array(envVariablesLength)
-  //     .fill(null)
-  //     .map((_, key) => (
-  //       <EnviromentVariable
-  //         key={key}
-  //         envVariables={envVariables}
-  //         setEnvVariables={setEnvVariables}
-  //       />
-  //     ));
-  //   setEnvVariablesEl(current);
-  // }, [envVariablesLength]);
+    console.log("valid form, submitting...");
+    // return {form: "form is not valid"};
+
+    let envs = [];
+    envVariables.forEach((env) => {
+      envs.push({key: env.env.key, value: env.env.value});
+    });
+
+    if (envs.length !== 0) {
+      values.envs = envs;
+    }
+    values.port = values.port.toString();
+    console.log(values);
+    const accessToken = getAccessToken();
+    API.post("/application/new/web", values, {
+      headers: {
+        Authorization: "Bearer " + accessToken,
+      },
+    })
+      .then((response) => {
+        console.log(response);
+        setShowModal(false);
+      })
+      .catch((error) => {
+        console.log("error:", error);
+        // setError(true);
+      });
+    setIsSubmitting(false);
+    // setShowModal(false);
+  };
 
   return (
     <div
       onClick={handleClose}
       className="closer absolute inset-0 z-40 flex items-center justify-center bg-black bg-opacity-25">
-      <div className="custom-shadow max-h-[90%] w-[90%] overflow-y-scroll rounded-xl bg-white px-8 lg:w-1/3">
+      <div className="custom-shadow max-h-[90%] w-[90%] overflow-y-scroll rounded-xl bg-white px-8 lg:w-1/2">
         <div className="py-8 text-xl font-semibold">new application</div>
-
-        <div className="mb-5">
-          <div className="mb-2">project name:</div>
-          <input
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.name}
-            spellCheck="false"
-            type="text"
-            name="name"
-            className="w-full rounded border-[1.5px] border-light-gray"
-          />
-          <p className="text-sm font-medium text-red-500">
-            {formik.touched.name && formik.errors.name}
-          </p>
-        </div>
-        <div className="mb-5">
-          <div className="mb-1">repository link:</div>
-          <input
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.repositoryLink}
-            spellCheck="false"
-            type="text"
-            name="repositoryLink"
-            className="w-full rounded border-[1.5px] border-light-gray"
-          />
-          <p className="text-sm font-medium text-red-500">
-            {formik.touched.repositoryLink && formik.errors.repositoryLink}
-          </p>
-        </div>
-        <div className="mb-5">
-          <div className="mb-1">select branch:</div>
-          {/* {validator.isURL(repositoryLink) ? ( */}
-          {false ? (
-            <select
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.branch}
-              name="branch"
-              className="w-full rounded border-[1.5px] border-light-gray">
-              <option>master</option>
-              <option>frontend</option>
-              <option>backend</option>
-            </select>
-          ) : (
-            <select
-              name="branch"
-              className="w-full rounded border-[1.5px] border-light-gray"
-              disabled></select>
+        <Formik
+          initialValues={{
+            repo: "",
+            branch: "",
+            name: "",
+            port: "",
+          }}>
+          {({errors, touched, values}) => (
+            <Form>
+              {/* repo */}
+              <div className="mb-5">
+                <RepositoryField
+                  isSubmitting={isSubmitting}
+                  setBranches={setBranches}
+                  errors={errors}
+                  touched={touched}
+                />
+              </div>
+              {/* branches */}
+              <div className="mb-5">
+                <div className="mb-1">select branch:</div>
+                <BranchField isSubmitting={isSubmitting} branches={branches} />
+              </div>
+              {/* name */}
+              <div className="mb-5">
+                <NameField
+                  isSubmitting={isSubmitting}
+                  touched={touched}
+                  errors={errors}
+                  kind="web"
+                />
+              </div>
+              {/* port */}
+              <div className="mb-5">
+                <PortField
+                  isSubmitting={isSubmitting}
+                  touched={touched}
+                  errors={errors}
+                />
+              </div>
+              {/* envs */}
+              <div className="mb-4">
+                <EnviromentVariableField
+                  envCallback={handleEnvVariablesCallback}
+                  title={"environment variables:"}
+                />
+              </div>
+              {isSubmitting ? (
+                <div className="mt-6 flex items-center justify-center space-x-2 py-6 text-lg font-semibold dark:invert">
+                  <span className="">Creating</span>
+                  <div className="h-1 w-1 animate-bounce rounded-full bg-black [animation-delay:-0.3s]"></div>
+                  <div className="h-1 w-1 animate-bounce rounded-full bg-black [animation-delay:-0.15s]"></div>
+                  <div className="h-1 w-1 animate-bounce rounded-full bg-black"></div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 py-6 text-lg font-semibold">
+                  <button
+                    type="button"
+                    onClick={handleClose}
+                    className="closer w-full rounded py-2 transition-all hover:bg-light-gray">
+                    cancel
+                  </button>
+                  <button
+                    // onClick={formik.handleSubmit}
+                    type="button"
+                    onSubmit={() => submitForm(values)}
+                    onClick={() => submitForm(values)}
+                    className="w-full rounded bg-blue py-2 text-white">
+                    create
+                  </button>
+                </div>
+              )}
+            </Form>
           )}
-          <p className="text-sm font-medium text-red-500">
-            {formik.touched.branch && formik.errors.branch}
-          </p>
-        </div>
-        {/* <div className="mb-5">
-          <div className="mb-1">programming language:</div>
-          {avaibleLanguage.length > 0 ? (
-            <select
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.language}
-              name="language"
-              className="w-full rounded border-[1.5px] border-light-gray">
-              {avaibleLanguage.map((language, key) => (
-                <option key={key}>{language}</option>
-              ))}
-            </select>
-          ) : (
-            <select
-              name="language"
-              className="w-full rounded border-[1.5px] border-light-gray"
-              disabled></select>
-          )} */}
-        {/* <p className="text-sm font-medium text-red-500">
-            {formik.touched.language && formik.errors.language}
-          </p> */}
-        {/* </div> */}
-        <div className="mb-5">
-          <div className="mb-1">port:</div>
-          <input
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.port}
-            name="port"
-            placeholder="8080"
-            type="number"
-            className="w-full rounded border-[1.5px] border-light-gray"
-          />
-          <p className="text-sm font-medium text-red-500">
-            {formik.touched.port && formik.errors.port}
-          </p>
-        </div>
-        <div className="mb-4">
-          <div className="mb-1">environment variables:</div>
-          {envVariablesEl}
-          <button
-            onClick={() => setEnvVariablesLength((prev) => prev + 1)}
-            className="w-full rounded border-[1.5px] border-light-gray py-2 transition-all hover:bg-light-gray">
-            new variable
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 py-6 text-lg font-semibold">
-          <button
-            onClick={handleClose}
-            className="closer w-full rounded py-2 transition-all hover:bg-light-gray">
-            cancel
-          </button>
-          <button
-            onClick={formik.handleSubmit}
-            className="w-full rounded bg-blue py-2 text-white">
-            create
-          </button>
-        </div>
+        </Formik>
       </div>
-    </div>
-  );
-};
-
-const EnviromentVariable = function ({
-  index,
-  envVariables,
-  setEnvVariables,
-  setEnvVariablesLength,
-}) {
-  const deleteVariable = () => {
-    console.log("delete variable of index:", index);
-    console.log("envVariables:", envVariables);
-    const newEnvVariables = [...envVariables];
-    newEnvVariables.splice(index, 1);
-    setEnvVariables(newEnvVariables);
-    console.log("newEnvVariables:", newEnvVariables);
-    setEnvVariablesLength((prev) => prev - 1);
-  };
-
-  const setEnvName = (e) => {
-    console.log("setEnvName:", e.target.value);
-    let vars = [...envVariables];
-    console.log("vars:", vars);
-    console.log("index:", index);
-    // if (vars[index].name === undefined) {
-    //   console.log("undefined");
-    //   vars = [...vars, {name: "", val: ""}];
-    // }
-    vars[index] = {
-      name: e.target.value,
-      val: vars[index]?.val || "",
-    };
-    setEnvVariables(vars);
-    console.log("envVariables:", vars);
-  };
-
-  const setEnvValue = (e) => {
-    console.log("setEnvValue:", e.target.value);
-    let vars = [...envVariables];
-    console.log("vars:", vars);
-    // if (vars[index].value === undefined) {
-    //   console.log("undefined");
-    //   vars = [...vars, {name: "", val: ""}];
-    // }
-    vars[index] = {
-      name: vars[index]?.name || "",
-      val: e.target.value,
-    };
-    setEnvVariables(vars);
-    console.log("envVariables:", vars);
-  };
-
-  return (
-    <div className="mb-2 flex items-center gap-2">
-      <input
-        onBlur={setEnvName}
-        placeholder="VARIABLE_NAME"
-        type="text"
-        spellCheck="false"
-        className="w-full rounded border-[1.5px] border-light-gray"
-      />
-      <input
-        onBlur={setEnvValue}
-        placeholder="somevalue"
-        type="text"
-        spellCheck="false"
-        className="w-full rounded border-[1.5px] border-light-gray"
-      />
-      <button
-        type="button"
-        onClick={deleteVariable}
-        className="rounded border-[1.5px] border-light-gray p-2 transition-all hover:bg-light-gray">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          className="h-6 w-6 fill-none stroke-gray">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-          />
-        </svg>
-      </button>
     </div>
   );
 };

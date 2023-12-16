@@ -25,10 +25,19 @@ const Login = function ({setLoggedIn}) {
     }
   }
 
+  const successCallback = function () {
+    setLoggedIn(true);
+    setError(false);
+  };
+
+  const errorCallback = function () {
+    setError(true);
+  };
+
   if (refreshToken && refreshTokenExpiration) {
     let expirationDate = new Date(refreshTokenExpiration);
     if (expirationDate > now) {
-      refreshTokens(refreshToken, setError, setLoggedIn);
+      refreshTokens(refreshToken, successCallback, errorCallback);
     } else {
       deleteTokens();
     }

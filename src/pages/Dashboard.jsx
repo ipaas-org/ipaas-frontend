@@ -14,9 +14,10 @@ const Dashboard = function ({setLoggedIn}) {
 
   useMemo(() => {
     console.log("updating applications");
+    console.log("servs", servs);
     let apps = [];
     let s = [];
-    servs.forEach((app) => {
+    servs?.forEach((app) => {
       if (app.kind === "web") {
         apps.push(app);
       } else {

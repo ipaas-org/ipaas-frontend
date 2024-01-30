@@ -34,12 +34,12 @@ var STORE = {
       let jsonData = null;
       try {
         jsonData = JSON.parse(window.localStorage.getItem(DATA + key));
-        console.log(
-          "%cGET OBJECT:",
-          "background: lightgreen; color: black",
-          key,
-          jsonData
-        );
+        // console.log(
+        //   "%cGET OBJECT:",
+        //   "background: lightgreen; color: black",
+        //   key,
+        //   jsonData
+        // );
       } catch (e) {
         console.log(e);
         return undefined;

@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-const EnviromentVariable = function ({
+const EnvironmentVariable = function ({
   id,
   deleteVariable,
   sendEnvCallback,
@@ -28,9 +28,7 @@ const EnviromentVariable = function ({
       setError((prev) => {
         return {...prev, variableKey: error};
       });
-      return;
-    }
-    if (!value.match("^[a-zA-Z0-9_-]*$")) {
+    } else if (!value.match("^[a-zA-Z0-9_-]*$")) {
       error = "Key must be letters, numbers, - or _";
       setIsError((prev) => {
         return {...prev, variableKey: true};
@@ -38,14 +36,14 @@ const EnviromentVariable = function ({
       setError((prev) => {
         return {...prev, variableKey: error};
       });
-      return;
+    } else {
+      setIsError((prev) => {
+        return {...prev, variableKey: false};
+      });
     }
 
     setEnv((prev) => {
       return {key: value, value: prev.value};
-    });
-    setIsError((prev) => {
-      return {...prev, variableKey: false};
     });
     return error;
   }
@@ -61,14 +59,14 @@ const EnviromentVariable = function ({
       setError((prev) => {
         return {...prev, variableValue: error};
       });
-      return;
+    } else {
+      setIsError((prev) => {
+        return {...prev, variableValue: false};
+      });
     }
 
     setEnv((prev) => {
       return {key: prev.key, value: value};
-    });
-    setIsError((prev) => {
-      return {...prev, variableValue: false};
     });
     return error;
   }
@@ -190,7 +188,6 @@ const EnviromentVariableField = ({
   const [envVariablesCounter, setEnvVariablesCounter] = useState(0);
   const [envs, setEnvs] = useState([]);
   const [shouldValidate, setShouldValidate] = useState(false);
-  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     setShouldValidate(forceValidate);
@@ -214,39 +211,32 @@ const EnviromentVariableField = ({
   }, [defaultEnvs]);
 
   const getEnvCallback = (id, env, isValid) => {
-    let newEnvs = envs;
-    console.log("get env callback,", id, env, isValid);
-    console.log("current envs:", newEnvs);
-    setIsError(!isValid);
-    let found = false;
-    for (let i = 0; i < newEnvs.length; i++) {
-      if (newEnvs[i].id === id) {
-        newEnvs[i].env = env;
-        newEnvs[i].isValid = isValid;
-        found = true;
-        break;
+    setEnvs((prev) => {
+      let newEnvs = [...prev];
+      console.log("get env callback:", id, env, isValid);
+      console.log("current envs in", title, ":", prev);
+
+      const index = newEnvs.findIndex((item) => item.id === id);
+      if (index !== -1) {
+        newEnvs[index] = {...newEnvs[index], env, isValid};
+      } else {
+        newEnvs.push({id, env, isValid});
       }
-    }
-    if (!found) {
-      newEnvs.push({id: id, env: env, isValid: isValid});
-    }
-    setEnvs(newEnvs);
+      console.log("new envs in", title, ":", newEnvs);
+      return newEnvs;
+    });
   };
 
   useEffect(() => {
     let isError = false;
     envs.forEach((e) => {
-      if (!e.isValid) {
-        isError = true;
-      }
+      isError = !e.isValid;
     });
+
+    console.log("sending to env callback");
     console.log("envs:", envs);
-    console.log(
-      "sending envs from envir field:",
-      envs,
-      "and isError:",
-      isError
-    );
+    console.log("envvars:", envVars);
+    console.log("isError:", isError);
     envCallback(envs, isError);
   }, [envs]);
 
@@ -258,13 +248,13 @@ const EnviromentVariableField = ({
       return current.filter((env) => env.id !== id);
     });
     setEnvs((current) => {
-      return current.filter((e) => e.id !== id);
-    });
-    setIsError(false);
-    envs.forEach((e) => {
-      if (!e.isValid) {
-        setIsError(true);
-      }
+      return current.filter((e) => {
+        console.log("envs e", e);
+        if (e.id === id) {
+          console.log("found");
+        }
+        return e.id !== id;
+      });
     });
   };
 
@@ -302,6 +292,13 @@ const EnviromentVariableField = ({
     setEnvVars((current) => {
       return current.concat(e);
     });
+    // setEnvs((current) => {
+    //   return current.concat({
+    //     id: id,
+    //     env: {key: id, value: ""},
+    //     isValid: false,
+    //   });
+    // });
     setEnvVariablesCounter(newId + 1);
   };
 
@@ -309,7 +306,7 @@ const EnviromentVariableField = ({
     <div className="mb-1">
       {title}
       {envVars.map((env) => (
-        <EnviromentVariable
+        <EnvironmentVariable
           id={env.key}
           key={env.key}
           deleteVariable={env.deleteVariable}
@@ -335,4 +332,4 @@ const EnviromentVariableField = ({
   );
 };
 
-export {EnviromentVariableField, EnviromentVariable};
+export {EnviromentVariableField, EnvironmentVariable as EnviromentVariable};

@@ -2,10 +2,7 @@ import {Formik, Form} from "formik";
 import {useEffect, useState, useMemo} from "react";
 // import * as Yup from "yup";
 import {API} from "../../utils/api";
-import {
-  EnviromentVariable,
-  EnviromentVariableField,
-} from "../fields/EnvironmentVariableField";
+import {EnviromentVariableField} from "../fields/EnvironmentVariableField";
 import NameField from "../fields/NameField";
 import ServiceSelectField from "../fields/ServiceSelectField";
 import {getAccessToken} from "../../utils/tokens";
@@ -15,7 +12,7 @@ const ServiceModal = function ({setShowModal, templates}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormValid, setIsFormValid] = useState({});
   const serviceKind = "storage";
-  const [envs, setEnvs] = useState({});
+  const [serviceEnvs, setServiceEnvs] = useState({});
   const [service, setService] = useState(templates[0]);
   const [envVariables, setEnvVariables] = useState({});
 
@@ -25,47 +22,54 @@ const ServiceModal = function ({setShowModal, templates}) {
     }
   };
 
-  const handleRequiredEnvVariablesCallback = function (env, isError) {
-    // console.log("received required envs:", env, isError);
+  const handleRequiredEnvVariablesCallback = function (requiredEnvs, isError) {
+    console.log("received required envs:", requiredEnvs, isError);
 
-    if (env.length === 0) {
-      setIsFormValid((prev) => {
-        return {optionals: prev.optionals, required: true};
-      });
+    if (requiredEnvs.length === 0) {
       setEnvVariables((prev) => {
         return {optionals: prev.optionals, required: []};
       });
+
+      setIsFormValid((prev) => {
+        return {optionals: prev.optionals, required: true};
+      });
     } else {
       setEnvVariables((prev) => {
-        return {optionals: prev.optionals, required: env};
+        return {optionals: prev.optionals, required: requiredEnvs};
       });
+
       setIsFormValid((prev) => {
         return {optionals: prev.optionals, required: !isError};
       });
     }
   };
 
-  const handleOptionalsEnvVariablesCallback = function (env, isError) {
-    // console.log("received optionals envs:", env, isError);
+  const handleOptionalsEnvVariablesCallback = function (
+    optionalsEnvs,
+    isError
+  ) {
+    console.warn("received optionals envs:", optionalsEnvs, isError);
     // console.log("envs leng", env.length);
 
-    if (env.length === 0) {
-      console.log("no errors");
-      setIsFormValid((prev) => {
-        return {required: prev.required, optionals: true};
-      });
+    if (optionalsEnvs.length === 0) {
       setEnvVariables((prev) => {
         return {required: prev.required, optionals: []};
       });
+
+      setIsFormValid((prev) => {
+        return {required: prev.required, optionals: true};
+      });
     } else {
       setEnvVariables((prev) => {
-        return {required: prev.required, optionals: env};
+        return {required: prev.required, optionals: optionalsEnvs};
       });
+
       setIsFormValid((prev) => {
         return {required: prev.required, optionals: !isError};
       });
     }
   };
+
   const handleServiceCallback = function (name) {
     let service = templates.find((service) => service.name === name);
     setService(service);
@@ -73,9 +77,9 @@ const ServiceModal = function ({setShowModal, templates}) {
 
   const submitForm = function (values) {
     setIsSubmitting(true);
-    console.log("values:", values);
-    console.log("isFormValid:", isFormValid);
-    console.log("envVariables:", envVariables);
+    // console.log("values:", values);
+    // console.log("isFormValid:", isFormValid);
+    // console.log("envVariables:", envVariables);
     if (!isFormValid.optionals || !isFormValid.required || values.name === "") {
       alert("form is not valid");
       setIsSubmitting(false);
@@ -116,12 +120,11 @@ const ServiceModal = function ({setShowModal, templates}) {
     // setShowModal(false);
   };
 
-  const optionalsEnvs = useMemo(() => {
-    console.log("recalcolating optional envs");
-    if (envs.optionals === null) {
+  let optionalsEnvs = useMemo(() => {
+    if (serviceEnvs.optionals == null) {
       return [];
     }
-    return envs.optionals?.map((env) => {
+    return serviceEnvs.optionals.map((env) => {
       return {
         key: env.key,
         allowKeyChange: false,
@@ -130,14 +133,13 @@ const ServiceModal = function ({setShowModal, templates}) {
         keyExplanation: env.key + ": " + env.value,
       };
     });
-  }, [envs.optionals]);
+  }, [serviceEnvs.optionals]);
 
-  const requiredEnvs = useMemo(() => {
-    console.log("recalcolating required envs");
-    if (envs.required === null) {
+  let requiredEnvs = useMemo(() => {
+    if (serviceEnvs.required == null) {
       return [];
     }
-    return envs.required?.map((env) => {
+    return serviceEnvs.required.map((env) => {
       return {
         key: env.key,
         allowKeyChange: false,
@@ -146,15 +148,15 @@ const ServiceModal = function ({setShowModal, templates}) {
         keyExplanation: env.key + ": " + env.value,
       };
     });
-  }, [envs.required]);
+  }, [serviceEnvs.required]);
 
   useEffect(() => {
     console.log("services in modal:", templates);
   }, []);
 
   useEffect(() => {
-    console.log("envs in modal:", envs);
-  }, [envs]);
+    console.log("envs in modal:", serviceEnvs);
+  }, [serviceEnvs]);
 
   useEffect(() => {
     console.log(
@@ -162,15 +164,21 @@ const ServiceModal = function ({setShowModal, templates}) {
       requiredEnvs,
       optionalsEnvs
     );
+    if (requiredEnvs.length === 0) {
+      setIsFormValid((prev) => {
+        return {optionals: prev.optionals, required: true};
+      });
+    }
   }, [requiredEnvs, optionalsEnvs]);
 
   useEffect(() => {
     console.log("selected service in modal:", service);
-    // setService;
-    setEnvs({
+    setEnvVariables({required: [], optionals: []});
+    setServiceEnvs({
       required: service.requiredEnvs,
       optionals: service.optionalEnvs,
     });
+    setIsFormValid({required: false, optionals: false});
   }, [service]);
 
   return (
@@ -206,15 +214,15 @@ const ServiceModal = function ({setShowModal, templates}) {
               </div>
               {/* required envs */}
               <div className="mb-5">
-                {/* {requiredEnvs?.length > 0 && ( */}
-                <EnviromentVariableField
-                  defaultEnvs={requiredEnvs}
-                  title={"Required Envs"}
-                  envCallback={handleRequiredEnvVariablesCallback}
-                  forceValidate={true}
-                  canAdd={false}
-                />
-                {/* )} */}
+                {requiredEnvs?.length > 0 && (
+                  <EnviromentVariableField
+                    defaultEnvs={requiredEnvs}
+                    title={"Required Envs"}
+                    envCallback={handleRequiredEnvVariablesCallback}
+                    forceValidate={true}
+                    canAdd={false}
+                  />
+                )}
               </div>
               {/* optional envs */}
               <div className="mb-5">

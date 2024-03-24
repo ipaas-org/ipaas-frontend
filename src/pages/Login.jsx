@@ -5,7 +5,8 @@ import {refreshTokens, retriveTokens, deleteTokens} from "../utils/tokens";
 import ErrorMessage from "../components/ErrorMessage";
 
 const Login = function ({setLoggedIn}) {
-  const [error, setError] = useState(false);
+  const [error, setError] = useState({isError: false, message: ""});
+  const [acceptWarning, setAcceptWarning] = useState(false);
 
   let accessToken = STORE.Storage.Get("accessToken");
   let accessTokenExpiration = STORE.Storage.Get("accessTokenExpiration");
@@ -27,11 +28,11 @@ const Login = function ({setLoggedIn}) {
 
   const successCallback = function () {
     setLoggedIn(true);
-    setError(false);
+    setError({isError: false});
   };
 
   const errorCallback = function () {
-    setError(true);
+    setError({isError: trsetAcceptWarning, setErrorue});
   };
 
   if (refreshToken && refreshTokenExpiration) {
@@ -53,7 +54,15 @@ const Login = function ({setLoggedIn}) {
   }
 
   const handleLogin = async function () {
-    //do request to api.ipaas.localhost/api/v1/login with axios
+    if (!acceptWarning) {
+      console.log("needs to accept warning");
+      setError({
+        isError: true,
+        message: "you must accept the warning to continue",
+      });
+      return;
+    }
+
     const response = await API.get("login", {
       headers: {
         "X-Login-Kind": "frontend",
@@ -67,20 +76,60 @@ const Login = function ({setLoggedIn}) {
   };
   return (
     <div className="flex h-screen items-center justify-center px-2">
-      <div className="w-full md:w-1/4">
-        <h1 className="text-center text-6xl font-bold md:text-8xl">IPAAS</h1>
-        <p className="mt-1 text-center text-xl">itis paleocapa as a service</p>
+      <div className="w-full md:w-1/2">
+        <h1 className="text-center text-6xl font-bold md:text-8xl">CARGOWAY</h1>
+        <p className="mt-1 text-center text-xl">
+          Applications ready for takeoff
+        </p>
         <button
           onClick={handleLogin}
           className="mt-8 w-full rounded-md bg-blue py-2 text-lg font-medium text-white transition-all hover:-translate-y-1">
-          accedi con GitHub
+          Login with GitHub
         </button>
         <div className="mt-8">
-          {error ? <ErrorMessage message="c'è stato un errore" /> : null}
+          {error.isError ? <ErrorMessage message={error.message} /> : null}
         </div>
-      </div>
+        {!acceptWarning ? (
+          <>
+            <br />
+            <AlphaWarning
+              setAcceptWarning={setAcceptWarning}
+              setError={setError}
+            />
+          </>
+        ) : null}
+      </div>{" "}
     </div>
   );
 };
 
 export default Login;
+
+const AlphaWarning = function ({setAcceptWarning, setError}) {
+  return (
+    <div role="alert">
+      <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2">
+        Alpha
+      </div>
+      <div className="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700">
+        <p>
+          This version of cargoway is currently in alpha so the interface or api
+          might change wihouth worrying about keeping retro-compatibility <br />
+          The cargoway team is not able to garantee uptime or data retention.
+          <br />
+          <b>DO NOT CURRENTLY USE CARGOWAY FOR ANY PRODUCTION APPLICATION</b>
+          <br />
+          <br />
+          <button
+            className="bg-red-500 text-white px-4 py-2 rounded-md"
+            onClick={() => {
+              setAcceptWarning(true);
+              setError({isError: false, message: ""});
+            }}>
+            I understand
+          </button>
+        </p>
+      </div>
+    </div>
+  );
+};

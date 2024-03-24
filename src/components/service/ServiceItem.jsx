@@ -20,7 +20,7 @@ const ServiceItem = function ({service, database}) {
       <div className="col-span-3">
         <div className="flex items-center">
           {state === "pending" && (
-            <div className="bg-gray-400 mr-2 rounded px-2 text-sm font-medium text-white">
+            <div className="bg-gray-400 mr-2 rounded px-2 text-sm font-medium text-black">
               pending
             </div>
           )}
@@ -51,7 +51,7 @@ const ServiceItem = function ({service, database}) {
             const accessToken = getAccessToken();
             console.log("deleting service: " + id);
             alert("deleting service: " + name);
-            API.delete("application/delete/" + id, {
+            API.delete("application/" + id + "/delete", {
               headers: {
                 Authorization: "Bearer " + accessToken,
               },

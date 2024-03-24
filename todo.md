@@ -1,0 +1,1 @@
+- [ ] useMemo in dashboard is not working properly

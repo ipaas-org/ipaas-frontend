@@ -99,7 +99,27 @@ const ApplicationItem = function ({application}) {
           </svg>
         </span> */}
         {/* rollout */}
-        <span className="rounded-md p-2 hover:bg-light-gray">
+        <span
+          className="rounded-md p-2 hover:bg-light-gray"
+          onClick={(e) => {
+            const accessToken = getAccessToken();
+            console.log("rolling out application: " + id);
+            alert("rolling out application: " + name);
+            API.get("application/" + id + "/rollout", {
+              headers: {
+                Authorization: "Bearer " + accessToken,
+              },
+            })
+              .then((response) => {
+                console.log("response", response);
+                // alert("deleted service: " + id);
+              })
+              .catch((error) => {
+                console.log("error", error);
+                alert("error rolling out application: " + name);
+              });
+            e.stopPropagation();
+          }}>
           <svg
             className="pointer-events-none h-6 w-6 fill-none stroke-black"
             xmlns="http://www.w3.org/2000/svg"

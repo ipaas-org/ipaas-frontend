@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 const EnvironmentVariable = function ({
   id,
@@ -6,16 +6,22 @@ const EnvironmentVariable = function ({
   sendEnvCallback,
   forceValidate,
   defaultKey = "",
+  value: defaultValue = "",
   keyExplanation = "",
   allowKeyChange = true,
   canRemove = true,
 }) {
-  const [env, setEnv] = useState({key: defaultKey, value: ""});
+  const [env, setEnv] = useState({ key: defaultKey, value: defaultValue });
   const [isError, setIsError] = useState({
     variableKey: false,
     variableValue: false,
   });
   const [error, setError] = useState({});
+
+  useEffect(() => {
+    console.log(">>>> SETTING DEFAULT ENV VALUES ");
+    setEnv({ key: defaultKey, value: defaultValue });
+  }, []);
 
   function validateKey(e) {
     const value = e.target.value;
@@ -23,27 +29,27 @@ const EnvironmentVariable = function ({
     if (!value) {
       error = "Key is required";
       setIsError((prev) => {
-        return {...prev, variableKey: true};
+        return { ...prev, variableKey: true };
       });
       setError((prev) => {
-        return {...prev, variableKey: error};
+        return { ...prev, variableKey: error };
       });
     } else if (!value.match("^[a-zA-Z0-9_-]*$")) {
       error = "Key must be letters, numbers, - or _";
       setIsError((prev) => {
-        return {...prev, variableKey: true};
+        return { ...prev, variableKey: true };
       });
       setError((prev) => {
-        return {...prev, variableKey: error};
+        return { ...prev, variableKey: error };
       });
     } else {
       setIsError((prev) => {
-        return {...prev, variableKey: false};
+        return { ...prev, variableKey: false };
       });
     }
 
     setEnv((prev) => {
-      return {key: value, value: prev.value};
+      return { key: value, value: prev.value };
     });
     return error;
   }
@@ -54,19 +60,19 @@ const EnvironmentVariable = function ({
     if (!value) {
       error = "Value is required";
       setIsError((prev) => {
-        return {...prev, variableValue: true};
+        return { ...prev, variableValue: true };
       });
       setError((prev) => {
-        return {...prev, variableValue: error};
+        return { ...prev, variableValue: error };
       });
     } else {
       setIsError((prev) => {
-        return {...prev, variableValue: false};
+        return { ...prev, variableValue: false };
       });
     }
 
     setEnv((prev) => {
-      return {key: prev.key, value: value};
+      return { key: prev.key, value: value };
     });
     return error;
   }
@@ -88,8 +94,8 @@ const EnvironmentVariable = function ({
   }, [env, isError]);
 
   useEffect(() => {
-    validateKey({target: {value: env.key}});
-    validateValue({target: {value: env.value}});
+    validateKey({ target: { value: env.key } });
+    validateValue({ target: { value: env.value } });
   }, [forceValidate]);
 
   return (
@@ -98,12 +104,13 @@ const EnvironmentVariable = function ({
         // onMouseEnter={showTooltip}
         // onMouseLeave={hideTooltip}
         // id={id}
-        className="flex items-center gap-2">
+        className="flex items-center gap-2"
+      >
         {allowKeyChange ? (
           <input
             placeholder="VARIABLE_KEY"
             type="text"
-            // value={defaultKey}
+            value={env.key}
             onChange={validateKey}
             onBlur={validateKey}
             // onSubmit={validateKey}
@@ -114,7 +121,7 @@ const EnvironmentVariable = function ({
           <input
             placeholder="VARIABLE_KEY"
             type="text"
-            value={defaultKey}
+            value={env.key}
             disabled={true}
             onChange={validateKey}
             onBlur={validateKey}
@@ -131,6 +138,7 @@ const EnvironmentVariable = function ({
           onChange={validateValue}
           onBlur={validateValue}
           type="text"
+          value={env.value}
           spellCheck="false"
           className="w-full rounded border-[1.5px] border-light-gray"
         />
@@ -139,12 +147,14 @@ const EnvironmentVariable = function ({
           <button
             type="button"
             onClick={deleteVariable}
-            className="rounded border-[1.5px] border-light-gray p-2 transition-all hover:bg-light-gray">
+            className="rounded border-[1.5px] border-light-gray p-2 transition-all hover:bg-light-gray"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
-              className="h-6 w-6 fill-none stroke-gray">
+              className="h-6 w-6 fill-none stroke-gray"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -158,7 +168,8 @@ const EnvironmentVariable = function ({
         // onMouseEnter={showTooltip}
         // onMouseLeave={hideTooltip}
         id={id}
-        className=" flex items-center gap-2">
+        className=" flex items-center gap-2"
+      >
         <p className="w-full text-sm font-medium text-red-500">
           {isError.variableKey && error.variableKey}
         </p>
@@ -190,6 +201,7 @@ const EnviromentVariableField = ({
   const [shouldValidate, setShouldValidate] = useState(false);
 
   useEffect(() => {
+    console.log("FORCING VALIDATION");
     setShouldValidate(forceValidate);
   }, [forceValidate]);
 
@@ -202,6 +214,7 @@ const EnviromentVariableField = ({
           env.key,
           env.allowKeyChange,
           env.defaultKey,
+          env.value,
           env.forceValidate,
           env.keyExplanation,
           env.canRemove
@@ -218,9 +231,9 @@ const EnviromentVariableField = ({
 
       const index = newEnvs.findIndex((item) => item.id === id);
       if (index !== -1) {
-        newEnvs[index] = {...newEnvs[index], env, isValid};
+        newEnvs[index] = { ...newEnvs[index], env, isValid };
       } else {
-        newEnvs.push({id, env, isValid});
+        newEnvs.push({ id, env, isValid });
       }
       console.log("new envs in", title, ":", newEnvs);
       return newEnvs;
@@ -262,12 +275,12 @@ const EnviromentVariableField = ({
     id = "",
     allowKeyChange = true,
     defaultKey = "",
+    defaultValue = "",
     forceValidate = false,
     // callback = getEnvCallback,
     keyExplanation = "",
     canRemove = true
   ) => {
-    console.log("add env variable");
     const newId = envVariablesCounter;
     // console.log("key", key);
     // console.log("newId", newId);
@@ -279,6 +292,7 @@ const EnviromentVariableField = ({
     let e = {
       id: id,
       key: id,
+      value: defaultValue,
       allowKeyChange: allowKeyChange,
       defaultKey: defaultKey,
       forceValidate: forceValidate,
@@ -313,6 +327,7 @@ const EnviromentVariableField = ({
           sendEnvCallback={env.sendEnvCallback}
           forceValidate={env.forceValidate}
           defaultKey={env.defaultKey}
+          value={env.value}
           keyExplanation={env.keyExplanation}
           allowKeyChange={env.allowKeyChange}
           canRemove={env.canRemove}
@@ -324,7 +339,8 @@ const EnviromentVariableField = ({
           onClick={() => {
             addEnvVariable("", true, "", false, "", true);
           }}
-          className="w-full rounded border-[1.5px] border-light-gray py-2 transition-all hover:bg-light-gray">
+          className="w-full rounded border-[1.5px] border-light-gray py-2 transition-all hover:bg-light-gray"
+        >
           new env variable
         </button>
       )}
@@ -332,4 +348,4 @@ const EnviromentVariableField = ({
   );
 };
 
-export {EnviromentVariableField, EnvironmentVariable as EnviromentVariable};
+export { EnviromentVariableField, EnvironmentVariable as EnviromentVariable };

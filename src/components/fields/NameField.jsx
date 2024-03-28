@@ -1,13 +1,23 @@
-import {Field, useFormikContext} from "formik";
-import {API} from "../../utils/api";
-import {getAccessToken} from "../../utils/tokens";
-import {useEffect, useRef, useState} from "react";
+import { Field, useFormikContext } from "formik";
+import { API } from "../../utils/api";
+import { getAccessToken } from "../../utils/tokens";
+import { useEffect, useRef, useState } from "react";
 
-const NameField = ({touched, errors, kind, isSubmitting}) => {
+const NameField = ({
+  touched,
+  errors,
+  kind,
+  isSubmitting,
+  defaultValue = "",
+  disabled = false,
+}) => {
   const lastInputForName = useRef();
-  const {setFieldValue} = useFormikContext();
+  const { setFieldValue } = useFormikContext();
   const [isValidatingName, setIsValidatingName] = useState(false);
-  const [name, setName] = useState({name: "", error: "Name is required"});
+  const [name, setName] = useState({
+    name: defaultValue,
+    error: "Name is required",
+  });
 
   useEffect(() => {
     let err = validateName(name.name);
@@ -24,25 +34,39 @@ const NameField = ({touched, errors, kind, isSubmitting}) => {
     }
   }, [name, setFieldValue]);
 
+  useEffect(() => {
+    if (defaultValue !== "") {
+      setFieldValue({ name: defaultValue, error: "" });
+    } else {
+      setFieldValue({ name: "", error: "Name is required" });
+    }
+  }, []);
+
   function validateName(value) {
     let error;
     if (value === name.name) {
       return name.error;
     }
-    // console.log("validating name:", value);
-
     clearTimeout(lastInputForName.current);
+
+    if (defaultValue !== "" && defaultValue === value) {
+      // console.log("bruh same stuff");
+      setName({ name: defaultValue, error: "" });
+      setIsValidatingName(false);
+      return;
+    }
+    // console.log("validating name:", value);
 
     if (!value) {
       error = "Project name is required";
       // console.log("error:", error);
-      setName({name: value, error: error});
+      setName({ name: value, error: error });
       return error;
     }
     if (!value.match("^[a-zA-Z0-9_-]*$")) {
       error = "Project name can not contain special characters except - and _";
       // console.log("error:", error);
-      setName({name: value, error: error});
+      setName({ name: value, error: error });
       return error;
     }
 
@@ -68,15 +92,15 @@ const NameField = ({touched, errors, kind, isSubmitting}) => {
         if (data.is_error) {
           error = "error validating name";
           console.error("error:", response.data);
-          setName({name: value, error: error});
+          setName({ name: value, error: error });
           resolve(error);
         } else if (data.valid) {
           // console.log("VALID");
-          setName({name: value, error: error});
+          setName({ name: value, error: error });
           resolve();
         } else {
           error = "name is not available";
-          setName({name: value, error: error});
+          setName({ name: value, error: error });
           resolve(error);
         }
         setIsValidatingName(false);
@@ -89,6 +113,7 @@ const NameField = ({touched, errors, kind, isSubmitting}) => {
       <div className="mb-2">project name:</div>
       <Field
         validate={validateName}
+        disabled={disabled}
         spellCheck="false"
         type="text"
         name="name"

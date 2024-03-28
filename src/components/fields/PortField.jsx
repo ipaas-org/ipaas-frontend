@@ -1,9 +1,12 @@
-import {Field, useFormikContext} from "formik";
-import {useEffect, useState} from "react";
+import { Field, useFormikContext } from "formik";
+import { useEffect, useState } from "react";
 
-const PortField = ({touched, errors, isSubmitting}) => {
-  const [port, setPort] = useState({port: "", error: "Port is required"});
-  const {setFieldValue} = useFormikContext();
+const PortField = ({ touched, errors, isSubmitting, defaultValue }) => {
+  const [port, setPort] = useState({
+    port: defaultValue,
+    error: "",
+  });
+  const { setFieldValue } = useFormikContext();
 
   useEffect(() => {
     let err = validatePort(port.port);
@@ -13,16 +16,24 @@ const PortField = ({touched, errors, isSubmitting}) => {
     }
   }, [isSubmitting]);
 
+  useEffect(() => {
+    let err = validatePort(port.port);
+    if (err) {
+      touched.port = true;
+      errors.port = err;
+    }
+  }, []);
+
   function validatePort(value) {
     let error;
     if (!value) {
       error = "Port is required";
-      setPort({port: "", error: error});
+      setPort({ port: "", error: error });
       return error;
     }
-    if (value < 20) {
-      error = "Port must be grater than 20";
-      setPort({port: "", error: error});
+    if (value < 10) {
+      error = "Port must be grater than 10";
+      setPort({ port: "", error: error });
       return error;
     }
     if (value > 65536) {
@@ -31,7 +42,7 @@ const PortField = ({touched, errors, isSubmitting}) => {
 
       return error;
     }
-    setPort({port: value, error: ""});
+    setPort({ port: value, error: "" });
   }
 
   return (

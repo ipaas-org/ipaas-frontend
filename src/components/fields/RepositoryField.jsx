@@ -1,12 +1,19 @@
-import {useEffect, useRef, useState} from "react";
-import {Field, useFormikContext} from "formik";
-import {API} from "../../utils/api";
-import {getAccessToken} from "../../utils/tokens";
+import { useEffect, useRef, useState } from "react";
+import { Field, useFormikContext } from "formik";
+import { API } from "../../utils/api";
+import { getAccessToken } from "../../utils/tokens";
 
-const RepositoryField = ({touched, errors, setBranches, isSubmitting}) => {
-  const {setFieldValue} = useFormikContext();
+const RepositoryField = ({
+  touched,
+  errors,
+  setBranches,
+  isSubmitting,
+  disabled = false,
+  defaultValue = "",
+}) => {
+  const { setFieldValue } = useFormikContext();
   const [repo, setRepo] = useState({
-    repo: "",
+    repo: defaultValue,
     error: "Repository link is required",
   });
   const lastInputForRepository = useRef();
@@ -38,13 +45,13 @@ const RepositoryField = ({touched, errors, setBranches, isSubmitting}) => {
     if (!value) {
       error = "Repository link is required";
       // console.log("error:", error);
-      setRepo({repo: "", error: error});
+      setRepo({ repo: "", error: error });
       setBranches([]);
       return error;
     } else if (!value.match("([A-Za-z0-9-])+/([A-Za-z0-9-])+")) {
       error = "Link must be a valid GitHub repo link <user>/<repo>";
       // console.log("error:", error);
-      setRepo({repo: value, error: error});
+      setRepo({ repo: value, error: error });
       setBranches([]);
       return error;
     }
@@ -70,12 +77,12 @@ const RepositoryField = ({touched, errors, setBranches, isSubmitting}) => {
         let data = resp.data;
         if (data.is_error) {
           error = "error validating repository";
-          setRepo({repo: value, error: error});
+          setRepo({ repo: value, error: error });
           setBranches([]);
           resolve(error);
         } else if (data.valid) {
           let b = [];
-          setRepo({repo: value, error: ""});
+          setRepo({ repo: value, error: "" });
           data.branches.forEach((branch) => {
             if (branch === data.defaultBranch) {
               b.unshift(branch);
@@ -88,7 +95,7 @@ const RepositoryField = ({touched, errors, setBranches, isSubmitting}) => {
         } else {
           error =
             "repository is not valid, check if you have access to it or if you misspelled it";
-          setRepo({repo: value, error: error});
+          setRepo({ repo: value, error: error });
           // console.log("removing branches");
           setBranches([]);
           resolve(error);
@@ -102,6 +109,7 @@ const RepositoryField = ({touched, errors, setBranches, isSubmitting}) => {
     <>
       <div className="mb-1">repository link:</div>
       <Field
+        disabled={disabled}
         validate={validateRepository}
         spellCheck="false"
         type="text"

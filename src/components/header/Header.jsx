@@ -1,9 +1,9 @@
-import {useState} from "react";
-import {API} from "../../utils/api";
+import { useState } from "react";
+import { API } from "../../utils/api";
 import STORE from "../../utils/store";
-import {getAccessToken} from "../../utils/tokens";
+import { getAccessToken } from "../../utils/tokens";
 import HeaderModal from "./HeaderModal";
-import {LoadingName, LoadingProfilePicture} from "../LoadingMessage";
+import { LoadingName, LoadingProfilePicture } from "../LoadingMessage";
 
 /*
 "code": "1233e57e-d6d2-43b8-b8ad-8645c81ef727",
@@ -38,7 +38,7 @@ const getUserInfo = async function (setUser) {
     });
 };
 
-const Header = function ({setLoggedIn}) {
+const Header = function ({ setLoggedIn }) {
   const [showModal, setShowModal] = useState(false);
   const [user, setUser] = useState(STORE.Storage.GetObject("user"));
   if (user === undefined) {
@@ -48,7 +48,7 @@ const Header = function ({setLoggedIn}) {
   return (
     <header className="grid grid-cols-2 pt-8 pb-5">
       <div className="flex items-center pb-1 font-medium md:text-lg">
-        Itis Paleocapa As A Service
+        Cargoway
       </div>
       <div>
         <div className="flex items-center justify-end">
@@ -59,7 +59,8 @@ const Header = function ({setLoggedIn}) {
           {user ? (
             <button
               onClick={() => setShowModal(true)}
-              className="h-10 w-10 overflow-hidden rounded-full border-2 transition-all hover:border-blue">
+              className="h-10 w-10 overflow-hidden rounded-full border-2 transition-all hover:border-blue"
+            >
               <img
                 className="object-cover"
                 src={user.userInfo.pfp}

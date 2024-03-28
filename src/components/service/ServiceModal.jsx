@@ -1,13 +1,13 @@
-import {Formik, Form} from "formik";
-import {useEffect, useState, useMemo} from "react";
+import { Formik, Form } from "formik";
+import { useEffect, useState, useMemo } from "react";
 // import * as Yup from "yup";
-import {API} from "../../utils/api";
-import {EnviromentVariableField} from "../fields/EnvironmentVariableField";
+import { API } from "../../utils/api";
+import { EnviromentVariableField } from "../fields/EnvironmentVariableField";
 import NameField from "../fields/NameField";
 import ServiceSelectField from "../fields/ServiceSelectField";
-import {getAccessToken} from "../../utils/tokens";
+import { getAccessToken } from "../../utils/tokens";
 
-const ServiceModal = function ({setShowModal, templates}) {
+const ServiceModal = function ({ setShowModal, templates }) {
   // const [serviceKind, setServiceKind] = useState("storage");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isFormValid, setIsFormValid] = useState({});
@@ -27,19 +27,19 @@ const ServiceModal = function ({setShowModal, templates}) {
 
     if (requiredEnvs.length === 0) {
       setEnvVariables((prev) => {
-        return {optionals: prev.optionals, required: []};
+        return { optionals: prev.optionals, required: [] };
       });
 
       setIsFormValid((prev) => {
-        return {optionals: prev.optionals, required: true};
+        return { optionals: prev.optionals, required: true };
       });
     } else {
       setEnvVariables((prev) => {
-        return {optionals: prev.optionals, required: requiredEnvs};
+        return { optionals: prev.optionals, required: requiredEnvs };
       });
 
       setIsFormValid((prev) => {
-        return {optionals: prev.optionals, required: !isError};
+        return { optionals: prev.optionals, required: !isError };
       });
     }
   };
@@ -53,19 +53,19 @@ const ServiceModal = function ({setShowModal, templates}) {
 
     if (optionalsEnvs.length === 0) {
       setEnvVariables((prev) => {
-        return {required: prev.required, optionals: []};
+        return { required: prev.required, optionals: [] };
       });
 
       setIsFormValid((prev) => {
-        return {required: prev.required, optionals: true};
+        return { required: prev.required, optionals: true };
       });
     } else {
       setEnvVariables((prev) => {
-        return {required: prev.required, optionals: optionalsEnvs};
+        return { required: prev.required, optionals: optionalsEnvs };
       });
 
       setIsFormValid((prev) => {
-        return {required: prev.required, optionals: !isError};
+        return { required: prev.required, optionals: !isError };
       });
     }
   };
@@ -90,11 +90,11 @@ const ServiceModal = function ({setShowModal, templates}) {
 
     let envs = [];
     envVariables.required.forEach((env) => {
-      envs.push({key: env.env.key, value: env.env.value});
+      envs.push({ key: env.env.key, value: env.env.value });
     });
 
     envVariables.optionals.forEach((env) => {
-      envs.push({key: env.env.key, value: env.env.value});
+      envs.push({ key: env.env.key, value: env.env.value });
     });
 
     if (envs.length !== 0) {
@@ -127,6 +127,7 @@ const ServiceModal = function ({setShowModal, templates}) {
     return serviceEnvs.optionals.map((env) => {
       return {
         key: env.key,
+        value: "",
         allowKeyChange: false,
         defaultKey: env.key,
         canRemove: true,
@@ -142,6 +143,7 @@ const ServiceModal = function ({setShowModal, templates}) {
     return serviceEnvs.required.map((env) => {
       return {
         key: env.key,
+        value: "",
         allowKeyChange: false,
         defaultKey: env.key,
         canRemove: false,
@@ -166,33 +168,35 @@ const ServiceModal = function ({setShowModal, templates}) {
     );
     if (requiredEnvs.length === 0) {
       setIsFormValid((prev) => {
-        return {optionals: prev.optionals, required: true};
+        return { optionals: prev.optionals, required: true };
       });
     }
   }, [requiredEnvs, optionalsEnvs]);
 
   useEffect(() => {
     console.log("selected service in modal:", service);
-    setEnvVariables({required: [], optionals: []});
+    setEnvVariables({ required: [], optionals: [] });
     setServiceEnvs({
       required: service.requiredEnvs,
       optionals: service.optionalEnvs,
     });
-    setIsFormValid({required: false, optionals: false});
+    setIsFormValid({ required: false, optionals: false });
   }, [service]);
 
   return (
     <div
       onClick={handleClose}
-      className="closer absolute inset-0 z-40 flex items-center justify-center bg-black bg-opacity-25">
+      className="closer absolute inset-0 z-40 flex items-center justify-center bg-black bg-opacity-25"
+    >
       <div className="custom-shadow max-h-[90%] w-[90%] overflow-y-scroll rounded-xl bg-white px-8 lg:w-1/2">
         <div className="py-8 text-xl font-semibold">new service</div>
         <Formik
           initialValues={{
             name: "",
             service: templates[0],
-          }}>
-          {({errors, touched, values}) => (
+          }}
+        >
+          {({ errors, touched, values }) => (
             <Form>
               {/* service */}
               <div className="mb-5">
@@ -247,7 +251,8 @@ const ServiceModal = function ({setShowModal, templates}) {
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="closer w-full rounded py-2 transition-all hover:bg-light-gray">
+                    className="closer w-full rounded py-2 transition-all hover:bg-light-gray"
+                  >
                     cancel
                   </button>
                   <button
@@ -255,7 +260,8 @@ const ServiceModal = function ({setShowModal, templates}) {
                     type="button"
                     onSubmit={() => submitForm(values)}
                     onClick={() => submitForm(values)}
-                    className="w-full rounded bg-blue py-2 text-white">
+                    className="w-full rounded bg-blue py-2 text-white"
+                  >
                     create
                   </button>
                 </div>

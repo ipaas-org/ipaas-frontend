@@ -1,13 +1,13 @@
-import {getAccessToken} from "../../utils/tokens";
-import {API} from "../../utils/api";
+import { getAccessToken } from "../../utils/tokens";
+import { API } from "../../utils/api";
 
-const ServiceItem = function ({service, database}) {
-  const {name, state, kind, dnsName, id} = database;
+const ServiceItem = function ({ service, database }) {
+  const { name, state, kind, dnsName, id } = database;
 
   const handleopen = function () {
     if (kind !== "managment") return;
     console.log("dnsname", dnsName);
-    window.open("http://" + dnsName, "_blank");
+    window.open("https://" + dnsName, "_blank");
   };
 
   return (
@@ -16,12 +16,23 @@ const ServiceItem = function ({service, database}) {
       className={
         "grid grid-cols-4 px-8 py-6 transition-all hover:bg-hover-blue" +
         (kind === "managment" ? " cursor-pointer" : "")
-      }>
+      }
+    >
       <div className="col-span-3">
         <div className="flex items-center">
           {state === "pending" && (
-            <div className="bg-gray-400 mr-2 rounded px-2 text-sm font-medium text-black">
-              pending
+            <div className="mr-2 rounded bg-zinc-400 px-2 text-sm font-medium text-white">
+              pending...
+            </div>
+          )}
+          {state === "rollingOut" && (
+            <div className="mr-2 rounded bg-zinc-400 px-2 text-sm font-medium text-white">
+              rolling out...
+            </div>
+          )}
+          {state === "starting" && (
+            <div className="mr-2 rounded bg-sky-600 px-2 text-sm font-medium text-white">
+              starting...
             </div>
           )}
           {state === "running" && (
@@ -39,7 +50,16 @@ const ServiceItem = function ({service, database}) {
               crashed
             </div>
           )}
-
+          {state === "deleting" && (
+            <div className="mr-2 rounded bg-red-400 px-2 text-sm font-medium text-white">
+              deleting...
+            </div>
+          )}
+          {state === "failed" && (
+            <div className="mr-2 rounded bg-red-400 px-2 text-sm font-medium text-white">
+              failed
+            </div>
+          )}
           <h4 className="truncate text-ellipsis text-lg">{name}</h4>
         </div>
 
@@ -47,6 +67,7 @@ const ServiceItem = function ({service, database}) {
       </div>
       <div className="z-10 flex items-center justify-end">
         <span
+          title="delete service"
           onClick={(e) => {
             const accessToken = getAccessToken();
             console.log("deleting service: " + id);
@@ -67,16 +88,19 @@ const ServiceItem = function ({service, database}) {
             // inutile se il db non è cliccabile come le applicazioni
             e.stopPropagation();
           }}
-          className="cursor-pointer rounded-md p-2 hover:bg-light-gray">
+          className="cursor-pointer rounded-md p-2 hover:bg-light-gray"
+        >
           <svg
             className="pointer-events-none h-6 w-6 fill-none stroke-black"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg">
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            ></path>
           </svg>
         </span>
       </div>

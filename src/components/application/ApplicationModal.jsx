@@ -1,14 +1,14 @@
-import {useState} from "react";
-import {Formik, Form} from "formik";
-import {API} from "../../utils/api";
+import { useState } from "react";
+import { Formik, Form } from "formik";
+import { API } from "../../utils/api";
 import BranchField from "../fields/BranchField";
-import {EnviromentVariableField} from "../fields/EnvironmentVariableField";
-import {getAccessToken} from "../../utils/tokens";
+import { EnviromentVariableField } from "../fields/EnvironmentVariableField";
+import { getAccessToken } from "../../utils/tokens";
 import RepositoryField from "../fields/RepositoryField";
 import NameField from "../fields/NameField";
 import PortField from "../fields/PortField";
 
-const ApplicationModal = function ({setShowModal}) {
+const ApplicationModal = function ({ setShowModal }) {
   const [branches, setBranches] = useState([]);
   const [envVariables, setEnvVariables] = useState([]);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -46,7 +46,7 @@ const ApplicationModal = function ({setShowModal}) {
 
     let envs = [];
     envVariables.forEach((env) => {
-      envs.push({key: env.env.key, value: env.env.value});
+      envs.push({ key: env.env.key, value: env.env.value });
     });
 
     if (envs.length !== 0) {
@@ -75,7 +75,8 @@ const ApplicationModal = function ({setShowModal}) {
   return (
     <div
       onClick={handleClose}
-      className="closer absolute inset-0 z-40 flex items-center justify-center bg-black bg-opacity-25">
+      className="closer absolute inset-0 z-40 flex items-center justify-center bg-black bg-opacity-25"
+    >
       <div className="custom-shadow max-h-[90%] w-[90%] overflow-y-scroll rounded-xl bg-white px-8 lg:w-1/2">
         <div className="py-8 text-xl font-semibold">new application</div>
         <Formik
@@ -84,8 +85,9 @@ const ApplicationModal = function ({setShowModal}) {
             branch: "",
             name: "",
             port: "",
-          }}>
-          {({errors, touched, values}) => (
+          }}
+        >
+          {({ errors, touched, values }) => (
             <Form>
               {/* repo */}
               <div className="mb-5">
@@ -137,7 +139,8 @@ const ApplicationModal = function ({setShowModal}) {
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="closer w-full rounded py-2 transition-all hover:bg-light-gray">
+                    className="closer w-full rounded py-2 transition-all hover:bg-light-gray"
+                  >
                     cancel
                   </button>
                   <button
@@ -145,7 +148,8 @@ const ApplicationModal = function ({setShowModal}) {
                     type="button"
                     onSubmit={() => submitForm(values)}
                     onClick={() => submitForm(values)}
-                    className="w-full rounded bg-blue py-2 text-white">
+                    className="w-full rounded bg-blue py-2 text-white"
+                  >
                     create
                   </button>
                 </div>

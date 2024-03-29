@@ -337,7 +337,7 @@ const EnviromentVariableField = ({
         <button
           type="button"
           onClick={() => {
-            addEnvVariable("", true, "", false, "", true);
+            addEnvVariable("", true, "", "", false, "", true);
           }}
           className="w-full rounded border-[1.5px] border-light-gray py-2 transition-all hover:bg-light-gray"
         >

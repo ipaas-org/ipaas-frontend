@@ -3,7 +3,8 @@ const DATA = "data_";
 
 var STORE = {
   Config: {
-    API: "http://localhost:8082/api/v1/",
+    API: "https://api.cargoway.cloud/api/v1/",
+    // API: "http://localhost:8082/api/v1/",
   },
   Storage: {
     Clear: function () {

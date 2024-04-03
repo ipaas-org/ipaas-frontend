@@ -39,6 +39,7 @@ const Dashboard = function ({ setLoggedIn }) {
   const getApplications = () => {
     setLoading(true);
     const accessToken = getAccessToken();
+    if (!accessToken) setLoggedIn(false);
 
     API.get("application/list/all", {
       headers: {

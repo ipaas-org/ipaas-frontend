@@ -1,4 +1,4 @@
-import {API} from "./api";
+import { API } from "./api";
 import STORE from "./store";
 
 const refreshTokens = function (refreshToken, successCallback, errorCallback) {
@@ -30,7 +30,7 @@ const refreshTokens = function (refreshToken, successCallback, errorCallback) {
 };
 
 const retriveTokens = function (key, setError, setLoggedIn) {
-  API.post("retriveTokens", {key: key})
+  API.post("retriveTokens", { key: key })
     .then((response) => {
       console.log(response);
       // console.log("response:", response);
@@ -76,10 +76,22 @@ const setTokens = function (
 const getAccessToken = function () {
   let accessToken = STORE.Storage.Get("accessToken");
   let accessTokenExpiration = STORE.Storage.Get("accessTokenExpiration");
-  if (!accessToken || !accessTokenExpiration) {
+  let now = new Date().getTime();
+  if (
+    !accessToken ||
+    !accessTokenExpiration ||
+    now > new Date(accessTokenExpiration)
+  ) {
     let refreshToken = STORE.Storage.Get("refreshToken");
     let refreshTokenExpiration = STORE.Storage.Get("refreshTokenExpiration");
-    if (!refreshToken || !refreshTokenExpiration) {
+    if (
+      !refreshToken ||
+      !refreshTokenExpiration ||
+      now > new Date(refreshTokenExpiration)
+    ) {
+      // redirect to login
+      deleteTokens();
+      setLoggedIn(false);
       return null;
     } else {
       refreshTokens(
@@ -87,11 +99,16 @@ const getAccessToken = function () {
         () => {
           console.log("tokens refreshed");
         },
-        () => {}
+        () => {
+          console.error("error refreshing tokens");
+        }
       );
       accessToken = STORE.Storage.Get("accessToken");
       accessTokenExpiration = STORE.Storage.Get("accessTokenExpiration");
       if (!accessToken || !accessTokenExpiration) {
+        // redirect to login
+        deleteTokens();
+        setLoggedIn(false);
         return null;
       }
       return accessToken;
@@ -100,4 +117,10 @@ const getAccessToken = function () {
   return accessToken;
 };
 
-export {getAccessToken, refreshTokens, retriveTokens, deleteTokens, setTokens};
+export {
+  getAccessToken,
+  refreshTokens,
+  retriveTokens,
+  deleteTokens,
+  setTokens,
+};

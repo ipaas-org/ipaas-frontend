@@ -2,21 +2,6 @@ import { useEffect, useState } from "react";
 import { getAccessToken } from "../../utils/tokens";
 import { API } from "../../utils/api";
 
-// const fromTimestampToRfc3339Nano = (timestamp) => {
-//   const nsReg = /(\d*)(\d{9})/;
-//   const ts = String(timestamp).replace(nsReg, "$1");
-//   const ns = String(timestamp).replace(nsReg, "$2");
-//   if (
-//     !timestamp ||
-//     parseInt(timestamp) < 999999999 ||
-//     !ts.length ||
-//     !ns.length
-//   ) {
-//     return null;
-//   }
-//   return new Date(parseInt(ts + "000")).toISOString().replace(".000", `.${ns}`);
-// };
-
 const LogModal = ({ applicationID, setShowModal }) => {
   const [metaLog, setMetaLog] = useState({
     isError: false,
@@ -52,6 +37,7 @@ const LogModal = ({ applicationID, setShowModal }) => {
       headers: headers,
     })
       .then((response) => {
+        console.log("response", response);
         if (response.data.message === "no new logs") {
           console.log("no new logs");
           return;
@@ -86,7 +72,7 @@ const LogModal = ({ applicationID, setShowModal }) => {
         console.log(error);
         setMetaLog({
           isError: true,
-          message: `Error fetching logs: ${error.response.data.details}`,
+          message: `Error fetching logs: ${error.response.details}`,
         });
       });
   };

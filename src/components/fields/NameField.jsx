@@ -63,8 +63,26 @@ const NameField = ({
       setName({ name: value, error: error });
       return error;
     }
-    if (!value.match("^[a-zA-Z0-9_-]*$")) {
-      error = "Project name can not contain special characters except - and _";
+    if (!value.match("^[a-zA-Z0-9-]*$")) {
+      error = "Project name can not contain special characters except -";
+      // console.log("error:", error);
+      setName({ name: value, error: error });
+      return error;
+    }
+    if (value.length < 2) {
+      error = "Project name must be at least 2 characters long";
+      // console.log("error:", error);
+      setName({ name: value, error: error });
+      return error;
+    }
+    if (value.length > 100) {
+      error = "Project name must be at most 100 characters long";
+      // console.log("error:", error);
+      setName({ name: value, error: error });
+      return error;
+    }
+    if (value[0] === "-" || value[value.length - 1] === "-") {
+      error = "Project name can not start or end with -";
       // console.log("error:", error);
       setName({ name: value, error: error });
       return error;
